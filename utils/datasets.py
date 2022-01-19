@@ -239,8 +239,8 @@ class LoadImages:
 
 class LoadcfImages:
     # YOLOv5 image/video dataloader, i.e. `python detect.py --source image.jpg/vid.mp4`
-    def __init__(self, img, img_size=640, stride=32, auto=True):
-        self.img = img
+    def __init__(self, imgs, img_size=640, stride=32, auto=True):
+        self.imgs = imgs
         self.mode = 'image'
         self.auto = auto
 
@@ -248,20 +248,26 @@ class LoadcfImages:
         self.stride = stride
 
         self.cap = None
+        self.nf = len(imgs)
 
     def __iter__(self):
         self.count = 0
         return self
 
     def __next__(self):
+        if self.count == self.nf:
+            raise StopIteration
+        img0 = self.imgs[self.count]
         # Padded resize
-        img = letterbox(self.img, self.img_size, stride=self.stride, auto=self.auto)[0]
+        self.count += 1
+
+        img = letterbox(img0, self.img_size, stride=self.stride, auto=self.auto)[0]
 
         # Convert
         img = img.transpose((2, 0, 1))[::-1]  # HWC to CHW, BGR to RGB
         img = np.ascontiguousarray(img)
 
-        return None, img, self.img, self.cap
+        return None, img, img0, self.cap
 
     def new_video(self, path):
         self.frame = 0

@@ -5,11 +5,11 @@ Run inference on images, videos, directories, streams, etc.
 Usage:
     $ python path/to/detect.py --source path/to/img.jpg --weights yolov5s.pt --img 640
 """
-import multiprocessing
 import argparse
 import os
 import sys
 import warnings
+from multiprocessing import Process, Pipe
 from pathlib import Path
 
 import cv2
@@ -113,8 +113,22 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
         strip_optimizer(weights)  # update model (to fix SourceChangeWarning)
 
 
-def parse_opt():
+def change_image_channels(image):
+    # 4通道转3通道
+    if image.mode == 'RGBA':
+        r, g, b, a = image.split()
+        image = Image.merge("RGB", (r, g, b))
+
+    #  1 通道转3通道
+    elif image.mode != 'RGB':
+        image = image.convert("RGB")
+
+    return image
+
+
+def get_opt():
     parser = argparse.ArgumentParser()
+
     parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'runs/train/exp/weights/best.pt', help='model path(s)')
     parser.add_argument('--source', type=str, default=ROOT / 'data/images/screen.jpg', help='file/dir/URL/glob, 0 for webcam')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[640], help='inference size h,w')
@@ -139,32 +153,20 @@ def parse_opt():
     return opt
 
 
-def change_image_channels(image):
-    # 4通道转3通道
-    if image.mode == 'RGBA':
-        r, g, b, a = image.split()
-        image = Image.merge("RGB", (r, g, b))
-
-    #  1 通道转3通道
-    elif image.mode != 'RGB':
-        image = image.convert("RGB")
-
-    return image
-
-
 if __name__ == "__main__":
-    opt = parse_opt()
-    check_requirements(exclude=('tensorboard', 'thop'))
+    opt = get_opt()
+
+    # check_requirements(exclude=('tensorboard', 'thop'))
     hwnd = win32gui.FindWindow(None, '穿越火线')
     app = QApplication(sys.argv)
     screen = QApplication.primaryScreen()
-    # Load model
 
-    w = 'runs/train/exp/weights/best.pt'
+    # Load model
     device = select_device(0)
     model = attempt_load('runs/train/exp/weights/best.pt', map_location=device)
     opt.device = device
     opt.model = model
+
     while True:
         img = screen.grabWindow(hwnd).toImage()
 
@@ -176,7 +178,7 @@ if __name__ == "__main__":
             new_image = Image.fromarray(arr)
             new_image = change_image_channels(new_image)
             new_image = np.array(new_image)
-            opt.source = new_image
+            opt.source = [new_image]
 
             new_image = run(**vars(opt))
             new_image = Image.fromarray(new_image)
