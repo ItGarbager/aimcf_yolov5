@@ -21,7 +21,7 @@ lxml==4.7.1
 Markdown==3.3.6
 matplotlib==3.5.1
 mss==6.1.0
-numpy==1.21.5
+numpy==1.22.1
 oauthlib==3.1.1
 opencv-python==4.5.5.62
 packaging==21.3
