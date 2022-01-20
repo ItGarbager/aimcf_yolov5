@@ -34,6 +34,8 @@ SCREEN_HEIGHT = screenRect.height()
 
 SCREEN_WIDTH_3 = SCREEN_WIDTH // 3
 SCREEN_HEIGHT_3 = SCREEN_HEIGHT // 3
+SCREEN_HANDLE_NAME = 'Counter-Strike: Global Offensive - Direct3D 9'  # csgo
+# SCREEN_HANDLE_NAME = '穿越火线'  # 穿越火线
 from models.experimental import attempt_load
 from utils.datasets import LoadcfImages
 from utils.general import check_img_size, check_requirements, \
@@ -160,14 +162,14 @@ def change_image_channels(image):
 def write(p1):
     print('Process(%s) write is writing...' % os.getpid())
 
-    hwnd = win32gui.FindWindow(None, '穿越火线')
+    hwnd = win32gui.FindWindow(None, SCREEN_HANDLE_NAME)
 
     screen = QApplication.primaryScreen()
     # Load model
 
     # 只获取屏幕中心位置的截图
     while True:
-        img = screen.grabWindow(hwnd, x=SCREEN_WIDTH_3, y=SCREEN_HEIGHT_3, width=SCREEN_WIDTH_3, height=SCREEN_HEIGHT_3).toImage()
+        img = screen.grabWindow(hwnd, x=SCREEN_HEIGHT_3, y=SCREEN_HEIGHT_3, width=SCREEN_HEIGHT_3, height=SCREEN_HEIGHT_3).toImage()
 
         size = img.size()
         try:
@@ -188,20 +190,18 @@ def write_lug_cfg(results):
     file = 'E:/Project/private/Logitech-lua/cf/main.lua'
     msg = []
     for result in results:
-        w = SCREEN_WIDTH_3 + result[0]
+        w = SCREEN_HEIGHT_3 + result[0]
         h = SCREEN_HEIGHT_3 + result[1]
-        # MoveMouseTo(x, y, )
         w = int(w / SCREEN_WIDTH * 65536)
         h = int(h / SCREEN_HEIGHT * 65536)
 
-        msg.append(f'ReleaseMouseButton(1);\nMoveMouseTo({w}, {h});\nPressMouseButton(1);\nPressMouseButton(1);')
+        msg.append(f'ReleaseMouseButton(1);\nMoveMouseRelative({w - 32768}, {h - 32768});\nPressMouseButton(1);\nPressMouseButton(1);')
     if msg:
         msg = '\nSleep(50);\n'.join(msg)
     else:
-        msg = ''
+        msg = '\n'
     with open(file, 'w') as f:
         f.write(msg)
-
 
 
 # 读数据进程执行的代码:

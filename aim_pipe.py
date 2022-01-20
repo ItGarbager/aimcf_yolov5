@@ -7,7 +7,6 @@ Usage:
 import argparse
 import os
 import sys
-import time
 import warnings
 from multiprocessing import Process, Pipe
 from pathlib import Path
@@ -34,6 +33,9 @@ desktop = QApplication.desktop()
 screenRect = desktop.screenGeometry()
 SCREEN_HEIGHT = screenRect.height()
 SCREEN_WIDTH = screenRect.width()
+SCREEN_HANDLE_NAME = 'Counter-Strike: Global Offensive - Direct3D 9'  # csgo
+# SCREEN_HANDLE_NAME = '穿越火线'  # 穿越火线
+
 from models.experimental import attempt_load
 from utils.datasets import LoadcfImages
 from utils.general import check_img_size, check_requirements, \
@@ -165,13 +167,12 @@ def change_image_channels(image):
 def write(p1):
     print('Process(%s) write is writing...' % os.getpid())
 
-    hwnd = win32gui.FindWindow(None, '穿越火线')
+    hwnd = win32gui.FindWindow(None, SCREEN_HANDLE_NAME)
     screen = QApplication.primaryScreen()
     # Load model
-    x_len = SCREEN_WIDTH // 3
     y_len = SCREEN_HEIGHT // 3
     while True:
-        img = screen.grabWindow(hwnd, x=x_len, y=y_len, width=x_len, height=y_len).toImage()
+        img = screen.grabWindow(hwnd, x=0, y=y_len, width=-1, height=y_len).toImage()
         size = img.size()
         try:
             s = img.bits().asstring(size.width() * size.height() * img.depth() // 8)  # format 0xffRRGGBB
@@ -223,7 +224,7 @@ def read2(c2):
                 height = new_image.size[1]  # 获取高度
                 new_image = new_image.resize((int(width * .5), int(height * .5)), Image.ANTIALIAS)
                 img = np.array(new_image)
-                name = 'test'
+                name = f'{SCREEN_HANDLE_NAME}_test'
                 cv2.imshow(name, img)
                 k = cv2.waitKey(1)  # 1 millisecond
                 if k % 256 == 27:
