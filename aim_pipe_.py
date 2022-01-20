@@ -9,7 +9,7 @@ import os
 import sys
 import time
 import warnings
-from multiprocessing import Process, Pipe
+from multiprocessing import Queue, Process, Pipe
 from pathlib import Path
 
 import cv2
@@ -28,12 +28,6 @@ if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))  # add ROOT to PATH
 ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
-app = QApplication(sys.argv)
-desktop = QApplication.desktop()
-# 获取显示器分辨率大小
-screenRect = desktop.screenGeometry()
-SCREEN_HEIGHT = screenRect.height()
-SCREEN_WIDTH = screenRect.width()
 from models.experimental import attempt_load
 from utils.datasets import LoadcfImages
 from utils.general import check_img_size, check_requirements, \
@@ -97,7 +91,6 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
         # NMS
         pred = non_max_suppression(pred, conf_thres, iou_thres, classes, agnostic_nms, max_det=max_det)
         # Process predictions
-        results = []
         for i, det in enumerate(pred):  # per image
 
             p, s, im0, frame = path, '', im0s.copy(), getattr(dataset, 'frame', 0)
@@ -115,9 +108,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
 
             # Stream results
             im0 = annotator.result()
-            if len(im0):
-                results.append(im0)
-        return results
+            return im0
     if update:
         strip_optimizer(weights)  # update model (to fix SourceChangeWarning)
 
@@ -166,12 +157,13 @@ def write(p1):
     print('Process(%s) write is writing...' % os.getpid())
 
     hwnd = win32gui.FindWindow(None, '穿越火线')
+    app = QApplication(sys.argv)
     screen = QApplication.primaryScreen()
     # Load model
-    x_len = SCREEN_WIDTH // 3
-    y_len = SCREEN_HEIGHT // 3
+
     while True:
-        img = screen.grabWindow(hwnd, x=x_len, y=y_len, width=x_len, height=y_len).toImage()
+        img = screen.grabWindow(hwnd).toImage()
+
         size = img.size()
         try:
             s = img.bits().asstring(size.width() * size.height() * img.depth() // 8)  # format 0xffRRGGBB
@@ -188,78 +180,58 @@ def write(p1):
 
 
 # 读数据进程执行的代码:
-def read(c1, p2):
+def read(c1):
     print('Process(%s) read1 is reading...' % os.getpid())
     opt = parse_opt()
     check_requirements(exclude=('tensorboard', 'thop'))
-    # w = 'runs/train/exp/weights/best.pt'
     device = select_device(0)
     model = attempt_load(opt.weights, map_location=device)
     opt.device = device
     opt.model = model
+    show_window = False
+
     while True:
         try:
 
             new_image = c1.recv()
             opt.source = [new_image]
-            new_images = run(**vars(opt))
-            p2.send(new_images)
+            new_image = run(**vars(opt))
+            new_image = Image.fromarray(new_image)
+            width = new_image.size[0]  # 获取宽度
+            height = new_image.size[1]  # 获取高度
+            new_image = new_image.resize((int(width * 0.2), int(height * 0.2)), Image.ANTIALIAS)
+            img = np.array(new_image)
+            name = 'test'
+            cv2.imshow(name, img)
+            k = cv2.waitKey(1)  # 1 millisecond
+            if k % 256 == 27:
+                # ESC pressed
+                cv2.destroyAllWindows()
+                exit("Escape hit, closing...")
+            if not show_window:
+                hwnd2 = win32gui.FindWindow(None, name)
+                # 窗口需要正常大小且在后台，不能最小化
+                win32gui.ShowWindow(hwnd2, win32con.SW_SHOWNORMAL)
+                win32gui.SetWindowPos(hwnd2, win32con.HWND_TOPMOST, 0, 0, 0, 0,
+                                      win32con.SWP_NOMOVE | win32con.SWP_NOACTIVATE | win32con.SWP_NOOWNERZORDER | win32con.SWP_SHOWWINDOW | win32con.SWP_NOSIZE)
 
         except Exception as e:
             c1.close()
             print('Error:', e)
-            exit('窗口已关闭')
-
-
-def read2(c2):
-    print('Process(%s) read2 is reading...' % os.getpid())
-    show_window = False
-    while True:
-        try:
-            new_images = c2.recv()
-            for new_image in new_images:
-                new_image = Image.fromarray(new_image)
-                width = new_image.size[0]  # 获取宽度
-                height = new_image.size[1]  # 获取高度
-                new_image = new_image.resize((int(width * .5), int(height * .5)), Image.ANTIALIAS)
-                img = np.array(new_image)
-                name = 'test'
-                cv2.imshow(name, img)
-                k = cv2.waitKey(1)  # 1 millisecond
-                if k % 256 == 27:
-                    # ESC pressed
-                    cv2.destroyAllWindows()
-                    exit("Escape hit, closing...")
-                if not show_window:
-                    hwnd2 = win32gui.FindWindow(None, name)
-                    # 窗口需要正常大小且在后台，不能最小化
-                    win32gui.ShowWindow(hwnd2, win32con.SW_SHOWNORMAL)
-                    win32gui.SetWindowPos(hwnd2, win32con.HWND_TOPMOST, 0, 0, 0, 0,
-                                          win32con.SWP_NOMOVE | win32con.SWP_NOACTIVATE | win32con.SWP_NOOWNERZORDER | win32con.SWP_SHOWWINDOW | win32con.SWP_NOSIZE)
-        except Exception as e:
-            print('Error:', e)
-            c2.close()
-
-            exit('窗口已关闭')
 
 
 if __name__ == '__main__':
-    # 父进程创建Queue，并传给各个子进程：
+    # 创建管道
     p1, c1 = Pipe()
-    p2, c2 = Pipe()
-    reader = Process(target=read, args=(c1, p2))
-    reader2 = Process(target=read2, args=(c2,))
+    reader = Process(target=read, args=(c1,))
     writer1 = Process(target=write, args=(p1,))
     # 启动子进程_reader，读取:
     reader.start()
-    reader2.start()
 
     # 启动子进程writer，写入:
     writer1.start()
 
     # reader进程里是死循环，无法等待其结束，只能强行终止:
     reader.join()
-    # reader2 进程里是死循环，无法等待其结束，只能强行终止:
-    reader2.join()
     # 等待writer结束:
     writer1.join()

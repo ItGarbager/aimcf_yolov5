@@ -91,6 +91,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
         # NMS
         pred = non_max_suppression(pred, conf_thres, iou_thres, classes, agnostic_nms, max_det=max_det)
         # Process predictions
+        results = []
         for i, det in enumerate(pred):  # per image
 
             p, s, im0, frame = path, '', im0s.copy(), getattr(dataset, 'frame', 0)
@@ -108,7 +109,8 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
 
             # Stream results
             im0 = annotator.result()
-            return im0
+            results.append(im0)
+        return results
     if update:
         strip_optimizer(weights)  # update model (to fix SourceChangeWarning)
 
@@ -117,8 +119,8 @@ def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'runs/train/exp/weights/best.pt', help='model path(s)')
     parser.add_argument('--source', type=str, default=ROOT / 'data/images/screen.jpg', help='file/dir/URL/glob, 0 for webcam')
-    parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[640], help='inference size h,w')
-    parser.add_argument('--conf-thres', type=float, default=0.6, help='confidence threshold')
+    parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[1000], help='inference size h,w')
+    parser.add_argument('--conf-thres', type=float, default=0.25, help='confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.45, help='NMS IoU threshold')
     parser.add_argument('--max-det', type=int, default=1000, help='maximum detections per image')
     parser.add_argument('--device', default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
@@ -184,9 +186,8 @@ def read(q, q2):
     print('Process(%s) read1 is reading...' % os.getpid())
     opt = parse_opt()
     check_requirements(exclude=('tensorboard', 'thop'))
-    w = 'runs/train/exp/weights/best.pt'
     device = select_device(0)
-    model = attempt_load(w, map_location=device)
+    model = attempt_load(opt.weights, map_location=device)
     opt.device = device
     opt.model = model
     while True:
@@ -194,9 +195,9 @@ def read(q, q2):
             if not q.empty():
                 new_image = q.get(True)
                 opt.source = [new_image]
-                new_image = run(**vars(opt))
+                new_images = run(**vars(opt))
                 if q2.empty():
-                    q2.put(new_image)
+                    q2.put(new_images)
 
         except Exception as e:
             q.close()
@@ -208,25 +209,26 @@ def read2(q2):
     show_window = False
     while True:
         try:
-            new_image = q2.get(True)
-            new_image = Image.fromarray(new_image)
-            width = new_image.size[0]  # 获取宽度
-            height = new_image.size[1]  # 获取高度
-            new_image = new_image.resize((int(width * 0.2), int(height * 0.2)), Image.ANTIALIAS)
-            img = np.array(new_image)
-            name = 'test'
-            cv2.imshow(name, img)
-            k = cv2.waitKey(1)  # 1 millisecond
-            if k % 256 == 27:
-                # ESC pressed
-                cv2.destroyAllWindows()
-                exit("Escape hit, closing...")
-            if not show_window:
-                hwnd2 = win32gui.FindWindow(None, name)
-                # 窗口需要正常大小且在后台，不能最小化
-                win32gui.ShowWindow(hwnd2, win32con.SW_SHOWNORMAL)
-                win32gui.SetWindowPos(hwnd2, win32con.HWND_TOPMOST, 0, 0, 0, 0,
-                                      win32con.SWP_NOMOVE | win32con.SWP_NOACTIVATE | win32con.SWP_NOOWNERZORDER | win32con.SWP_SHOWWINDOW | win32con.SWP_NOSIZE)
+            new_images = q2.get(True)
+            for new_image in new_images:
+                new_image = Image.fromarray(new_image)
+                width = new_image.size[0]  # 获取宽度
+                height = new_image.size[1]  # 获取高度
+                new_image = new_image.resize((int(width * 0.2), int(height * 0.2)), Image.ANTIALIAS)
+                img = np.array(new_image)
+                name = 'test'
+                cv2.imshow(name, img)
+                k = cv2.waitKey(1)  # 1 millisecond
+                if k % 256 == 27:
+                    # ESC pressed
+                    cv2.destroyAllWindows()
+                    exit("Escape hit, closing...")
+                if not show_window:
+                    hwnd2 = win32gui.FindWindow(None, name)
+                    # 窗口需要正常大小且在后台，不能最小化
+                    win32gui.ShowWindow(hwnd2, win32con.SW_SHOWNORMAL)
+                    win32gui.SetWindowPos(hwnd2, win32con.HWND_TOPMOST, 0, 0, 0, 0,
+                                          win32con.SWP_NOMOVE | win32con.SWP_NOACTIVATE | win32con.SWP_NOOWNERZORDER | win32con.SWP_SHOWWINDOW | win32con.SWP_NOSIZE)
         except Exception as e:
             print('Error:', e)
             q2.close()
