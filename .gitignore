@@ -25,6 +25,8 @@
 storage.googleapis.com
 runs/*
 data/*
+cf_data/*
+csgo_data/*
 !data/hyps/*
 !data/images/zidane.jpg
 !data/images/bus.jpg
