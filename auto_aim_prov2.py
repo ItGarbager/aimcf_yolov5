@@ -15,6 +15,7 @@ from auto_scripts.configs import *
 # 创建一个命名窗口
 from auto_scripts.get_model import load_model_infos
 # loadConfig
+from auto_scripts.mouse.mouse import mouse_down, mouse_up
 from auto_scripts.mouse_controller import lock
 # 消除警告信息
 from utils.augmentations import letterbox
@@ -143,9 +144,9 @@ def get_bbox(c2):
             exit('结束 get_bbox 进程中 ...')
         else:
             if aims and LOCK_MOUSE:
-                t = threading.Thread(target=lock, args=(aims, mouse, GAME_X, GAME_Y), kwargs={'logitech': True})
-                t.start()
-                # t.join()
+                p = threading.Thread(target=lock, args=(aims, mouse, GAME_X, GAME_Y), kwargs={'logitech': True, 'model_type': None})
+                p.start()
+                p.join()
 
 
 if __name__ == '__main__':
