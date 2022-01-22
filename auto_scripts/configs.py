@@ -11,12 +11,13 @@ SCREEN_HEIGHT = _screen_rect.height()
 
 # 实时显示窗口名称
 SCREEN_NAME = 'csgo_detect'
-# mss 截图指定区域
-MONITOR = {"top": 0, "left": 0, "width": SCREEN_WIDTH, "height": SCREEN_HEIGHT}
-
 # 游戏内分辨率大小
 GAME_X, GAME_Y = (1920, 1080)
 # GAME_X, GAME_Y = (SCREEN_WIDTH, SCREEN_HEIGHT)
+
+# mss 截图指定区域
+MONITOR = {"top": 0, "left": 0, "width": GAME_X, "height": GAME_Y}
+
 
 # 重设窗口大小
 RESIZE_X = SCREEN_WIDTH // 4
