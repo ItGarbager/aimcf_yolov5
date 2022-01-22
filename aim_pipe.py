@@ -78,6 +78,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
         model.half()  # to FP16
 
     imgsz = check_img_size(imgsz, s=stride)  # check image size
+
     # Run inference
     if device.type != 'cpu':
         model(torch.zeros(1, 3, *imgsz).to(device).type_as(next(model.parameters())))  # run once
@@ -126,10 +127,10 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'runs/train/exp/weights/best.pt', help='model path(s)')
+    parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'runs/train/exp4/weights/best.pt', help='model path(s)')
     parser.add_argument('--source', type=str, default=ROOT / 'data/images/screen.jpg', help='file/dir/URL/glob, 0 for webcam')
-    parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[1024], help='inference size h,w')
-    parser.add_argument('--conf-thres', type=float, default=0.25, help='confidence threshold')
+    parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[640], help='inference size h,w')
+    parser.add_argument('--conf-thres', type=float, default=0.4, help='confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.45, help='NMS IoU threshold')
     parser.add_argument('--max-det', type=int, default=1000, help='maximum detections per image')
     parser.add_argument('--device', default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
@@ -209,7 +210,7 @@ def read(c1, p2):
         except Exception as e:
             c1.close()
             print('Error:', e)
-            exit('窗口已关闭')
+            exit('窗口已关闭1')
 
 
 def read2(c2):
@@ -238,10 +239,9 @@ def read2(c2):
                     win32gui.SetWindowPos(hwnd2, win32con.HWND_TOPMOST, 0, 0, 0, 0,
                                           win32con.SWP_NOMOVE | win32con.SWP_NOACTIVATE | win32con.SWP_NOOWNERZORDER | win32con.SWP_SHOWWINDOW | win32con.SWP_NOSIZE)
         except Exception as e:
-            print('Error:', e)
             c2.close()
-
-            exit('窗口已关闭')
+            print('Error:', e)
+            exit('窗口已关闭2')
 
 
 if __name__ == '__main__':
