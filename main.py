@@ -1,17 +1,13 @@
-import os
 import signal
 import threading
 import warnings
 from multiprocessing import Pipe, Process
 from sys import platform
 
-import cv2
 import numpy as np
 import pynput
 import torch
 import win32con
-import win32gui
-
 # 消除警告信息
 from win32api import GetCurrentProcessId, OpenProcess
 from win32process import SetPriorityClass, ABOVE_NORMAL_PRIORITY_CLASS
@@ -19,7 +15,6 @@ from win32process import SetPriorityClass, ABOVE_NORMAL_PRIORITY_CLASS
 from tools import *
 from tools.configs import *
 from tools.get_model import load_model_infos
-from tools.mouse import mouse_down, mouse_up
 from tools.mouse_controller import mouse_lock_def
 from utils.augmentations import letterbox
 from utils.general import non_max_suppression, scale_coords, xyxy2xywh

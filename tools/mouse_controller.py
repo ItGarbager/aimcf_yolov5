@@ -31,10 +31,10 @@ def mouse_lock_def(aims, mouse, x, y):
         offset_x *= coef
 
         mouse_xy(offset_x, offset_y)
-        mouse_click_onece(1)
+        mouse_click_onece(0.05)
     elif tag == 0 or tag == 2:
         offset_x = x_center - mouse_pos_x
         offset_y = y_center - height * 2 / 5 - mouse_pos_y
         offset_x *= coef
         mouse_xy(offset_x, offset_y)
-        mouse_click_onece(1)
+        mouse_click_onece(0.05)
