@@ -38,7 +38,7 @@ mouse = pynput.mouse.Controller()
 # 点击监听
 def on_click(x, y, button, pressed):
     global LOCK_MOUSE
-    if pressed and button == button.x2:
+    if pressed and button == getattr(button, AIM_BUTTON):
         LOCK_MOUSE = not LOCK_MOUSE
         print('LOCK_MOUSE', LOCK_MOUSE)
 
@@ -146,7 +146,6 @@ def get_bbox(c2):
             if aims and LOCK_MOUSE:
                 p = threading.Thread(target=mouse_lock_def, args=(aims, mouse, GAME_X, GAME_Y))
                 p.start()
-
 
 
 if __name__ == '__main__':

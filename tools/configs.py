@@ -27,15 +27,15 @@ RESIZE_Y = SCREEN_HEIGHT // 4
 WEIGHTS = r'E:\Project\private\DeepLearn\PyTorchLearn\yolov5_6.0\auto_scripts\weights\cf.pt'
 
 # 预测转换图片大小
-IMGSZ = (640, 640)
+IMGSZ = (640, 640)  # 默认
 
 # 置信度
-CONF_THRES = .25
+CONF_THRES = .25  # 大于该置信度的目标才会被显示
 
 # IOU
 IOU_THRES = .45
 
-# 方框宽度
+# 方框线条粗细
 LINE_THICKNESS = 4
 
 # 是否显示图像
@@ -47,5 +47,5 @@ SHOW_LABEL = False
 # label font
 FONT = cv2.FONT_HERSHEY_SIMPLEX
 
-# 鼠标 DPI
-
+# 自瞄开关按键
+AIM_BUTTON = 'x2'  # 对应按键的关系表可以百度
