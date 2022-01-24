@@ -1,7 +1,10 @@
 import sys
 
 import cv2
+import numpy as np
 from PyQt5.QtWidgets import QApplication
+
+from tools import get_window_info
 
 app = QApplication(sys.argv)
 _desktop = QApplication.desktop()
@@ -17,7 +20,7 @@ GAME_X, GAME_Y = (1920, 1080)
 # GAME_X, GAME_Y = (SCREEN_WIDTH, SCREEN_HEIGHT)
 
 # mss 截图指定区域
-MONITOR = {"top": 0, "left": 0, "width": GAME_X, "height": GAME_Y}
+MONITOR = {"left": SCREEN_WIDTH // 3, "top": SCREEN_WIDTH // 4, "width": SCREEN_WIDTH // 3, "height": SCREEN_HEIGHT // 2}
 
 # 重设窗口大小
 RESIZE_X = SCREEN_WIDTH // 4
@@ -30,7 +33,7 @@ WEIGHTS = r'E:\Project\private\DeepLearn\PyTorchLearn\yolov5_6.0\auto_scripts\we
 IMGSZ = (640, 640)  # 默认
 
 # 置信度
-CONF_THRES = .25  # 大于该置信度的目标才会被显示
+CONF_THRES = .4  # 大于该置信度的目标才会被显示
 
 # IOU
 IOU_THRES = .45
@@ -39,7 +42,7 @@ IOU_THRES = .45
 LINE_THICKNESS = 4
 
 # 是否显示图像
-SHOW_IMG = False
+SHOW_IMG = True
 
 # 是否显示 label
 SHOW_LABEL = False
@@ -49,3 +52,15 @@ FONT = cv2.FONT_HERSHEY_SIMPLEX
 
 # 自瞄开关按键
 AIM_BUTTON = 'x2'  # 对应按键的关系表可以百度
+
+# 设计速度
+SHOT_SPEED = 169.4
+
+# 初始化一个尽可能小却小得不过分的数
+SMALL_FLOAT = np.finfo(np.float64).eps
+
+# # 寻找读取游戏窗口类型并确认截取位置
+# WINDOW_CLASS_NAME, WINDOW_HWND_NAME, WINDOW_OUTER_NAME, _ = get_window_info()
+
+# DPI
+DPI = 1  # 默认即可
