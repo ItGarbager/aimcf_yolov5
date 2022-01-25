@@ -78,6 +78,8 @@ def mouse_lock_def(aims, mouse, x, y, pids, move_factor, arr):
         pid_move_y = - pid_y(move_y)
 
         move_mouse(pid_move_x, pid_move_y)
-        # if time.time() * 1000 - arr[0] > SHOT_SPEED and (pid_move_y ** 2 + pid_move_x ** 2) ** .5 <= 3:
-        #     mouse_down(1)
-        #     mouse_up(1)
+
+        # 下面的是到达一定范围内，不需要直接注释掉即可 可以自动开枪
+        if time.time() * 1000 - arr[0] > SHOT_SPEED and (pid_move_y ** 2 + pid_move_x ** 2) ** .5 <= 3:
+            mouse_down(1)
+            mouse_up(1)
