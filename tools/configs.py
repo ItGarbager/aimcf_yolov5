@@ -15,19 +15,17 @@ SCREEN_HEIGHT = _screen_rect.height()
 
 # 实时显示窗口名称
 SCREEN_NAME = 'csgo_detect'
-# 游戏内分辨率大小
-GAME_X, GAME_Y = (1920, 1080)
-# GAME_X, GAME_Y = (SCREEN_WIDTH, SCREEN_HEIGHT)
 
 # mss 截图指定区域
-MONITOR = {"left": SCREEN_WIDTH // 3, "top": SCREEN_WIDTH // 4, "width": SCREEN_WIDTH // 3, "height": SCREEN_HEIGHT // 2}
+# MONITOR = {"left": SCREEN_WIDTH // 3, "top": SCREEN_WIDTH // 4, "width": SCREEN_WIDTH // 3, "height": SCREEN_HEIGHT // 2}
+MONITOR = {"left": 760, "top": 340, "width": 400, "height": 300}
 
 # 重设窗口大小
 RESIZE_X = SCREEN_WIDTH // 4
 RESIZE_Y = SCREEN_HEIGHT // 4
 
 # 模型文件
-WEIGHTS = r'E:\Project\private\DeepLearn\PyTorchLearn\yolov5_6.0\auto_scripts\weights\cf.pt'
+WEIGHTS = 'weights/best.pt'
 
 # 预测转换图片大小
 IMGSZ = (640, 640)  # 默认
@@ -53,7 +51,7 @@ FONT = cv2.FONT_HERSHEY_SIMPLEX
 # 自瞄开关按键
 AIM_BUTTON = 'x2'  # 对应按键的关系表可以百度
 
-# 设计速度
+# 主武器射击速度
 SHOT_SPEED = 169.4
 
 # 初始化一个尽可能小却小得不过分的数

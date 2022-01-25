@@ -57,7 +57,7 @@ def mouse_lock_def(aims, mouse, x, y, pids, move_factor, arr):
     y_center = y * y_center + MONITOR.get('top')
     # width = x * width
     height = y * height
-    if tag == 1 or tag == 3:
+    if tag == 1 or tag == 3:  # cf
         move_x = x_center - mouse_pos_x
         move_y = y_center - mouse_pos_y
         # mouse_xy(offset_x, offset_y)
@@ -70,14 +70,14 @@ def mouse_lock_def(aims, mouse, x, y, pids, move_factor, arr):
 
     # 判断是否需要移动
     if move_x or move_y:
-        move_x = FOV(move_x, x) / DPI * move_factor
+        # move_x = FOV(move_x, x) / DPI * move_factor
 
-        move_y = FOV(move_y, y) / DPI * move_factor
+        # move_y = FOV(move_y, y) / DPI * move_factor
 
         pid_move_x = - pid_x(move_x)
         pid_move_y = - pid_y(move_y)
 
         move_mouse(pid_move_x, pid_move_y)
-        if time.time() * 1000 - arr[0] > SHOT_SPEED and (pid_move_y ** 2 + pid_move_x ** 2) ** .5 <= 3:
-            mouse_down(1)
-            mouse_up(1)
+        # if time.time() * 1000 - arr[0] > SHOT_SPEED and (pid_move_y ** 2 + pid_move_x ** 2) ** .5 <= 3:
+        #     mouse_down(1)
+        #     mouse_up(1)

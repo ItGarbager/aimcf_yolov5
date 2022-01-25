@@ -18,7 +18,7 @@ from win32process import SetPriorityClass, ABOVE_NORMAL_PRIORITY_CLASS
 from tools import *
 from tools.configs import *
 from tools.get_model import load_model_infos
-from tools.mouse_controller import mouse_lock_def
+from tools.csgo_contronller import mouse_lock_def
 from utils.augmentations import letterbox
 from utils.general import non_max_suppression, scale_coords, xyxy2xywh
 from utils.plots import Annotator, colors
@@ -172,8 +172,8 @@ def get_bbox(c2, arr):
     process_times = deque()
 
     # 初始化 pid
-    pid_x = PID(0.15, 0.0, 0.0, setpoint=0, sample_time=0.006, )
-    pid_y = PID(0.15, 0.0, 0.0, setpoint=0, sample_time=0.006, )
+    pid_x = PID(0.3, 0.0, 0.0, setpoint=0, sample_time=0.006, )
+    pid_y = PID(0.3, 0.0, 0.0, setpoint=0, sample_time=0.006, )
     pid_xy = (pid_x, pid_y)
 
     # 测试过的几个游戏的移动系数,鼠标灵敏度设置看备注
@@ -183,7 +183,7 @@ def get_bbox(c2, arr):
     #     'LaunchCombatUWindowsClient': 1.319,  # 10.0
     #     'LaunchUnrealUWindowsClient': 0.500,  # 20
     # }.get(WINDOW_CLASS_NAME, 1)
-    move_factor = 0.971  # 鼠标速度 40
+    move_factor = 1.667  # 鼠标速度 40
     while True:
         aims = c2.recv()
         # 花费时间
