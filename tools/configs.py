@@ -18,14 +18,14 @@ SCREEN_NAME = 'csgo_detect'
 
 # mss 截图指定区域
 # MONITOR = {"left": SCREEN_WIDTH // 3, "top": SCREEN_WIDTH // 4, "width": SCREEN_WIDTH // 3, "height": SCREEN_HEIGHT // 2}
-MONITOR = {"left": 760, "top": 340, "width": 400, "height": 300}
+MONITOR = {"left": 810, "top": 440, "width": 300, "height": 200}
 
 # 重设窗口大小
-RESIZE_X = SCREEN_WIDTH // 4
-RESIZE_Y = SCREEN_HEIGHT // 4
+RESIZE_X = 150
+RESIZE_Y = 100
 
 # 模型文件
-WEIGHTS = 'weights/best.pt'
+WEIGHTS = 'weights/cf.pt'
 
 # 预测转换图片大小
 IMGSZ = (640, 640)  # 默认

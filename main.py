@@ -1,3 +1,4 @@
+import math
 import signal
 import threading
 import warnings
@@ -5,7 +6,6 @@ from collections import deque
 from multiprocessing import Pipe, Process, Array, Lock
 from statistics import median
 from sys import platform
-
 import mss
 import pynput
 import torch
@@ -34,7 +34,11 @@ names = model.module.names if hasattr(model, 'module') else model.names  # get c
 
 # 自瞄开关
 LOCK_MOUSE = False
+# 压枪开关
+LOCK_PRESS = False
 
+# 压枪计数
+C = 0
 # 鼠标控制
 mouse = pynput.mouse.Controller()
 
@@ -149,20 +153,24 @@ def img_show(c1, p2, arr):
 
 
 def get_bbox(c2, arr):
-    global LOCK_MOUSE
+    global LOCK_MOUSE, LOCK_PRESS, C
     print('进程 auto_aim 启动 ...')
 
     # 鼠标点击监听
     def on_click(x, y, button, pressed):
-        global LOCK_MOUSE
+        global LOCK_MOUSE, LOCK_PRESS, C
         if pressed and button == getattr(button, AIM_BUTTON):
             LOCK_MOUSE = not LOCK_MOUSE
             print('LOCK_MOUSE', LOCK_MOUSE)
         if button == Button.left:
             if pressed:
                 change_withlock(arr, 0, time() * 1000, process_lock)  # 更新左键按下时间
+                LOCK_PRESS = True
             else:
                 change_withlock(arr, 1, time() * 1000, process_lock)  # 更新左键抬起时间
+                LOCK_PRESS = False
+                move_mouse(0, -C)
+                C = 0
 
     # 监听鼠标事件
     listener = pynput.mouse.Listener(on_click=on_click)
@@ -172,8 +180,8 @@ def get_bbox(c2, arr):
     process_times = deque()
 
     # 初始化 pid
-    pid_x = PID(0.15, 0.0, 0.0, setpoint=0, sample_time=0.006, )
-    pid_y = PID(0.15, 0.0, 0.0, setpoint=0, sample_time=0.006, )
+    pid_x = PID(0.08, 0, 0, setpoint=0, sample_time=0.006, )
+    pid_y = PID(0.08, 0, 0, setpoint=0, sample_time=0.006, )
     pid_xy = (pid_x, pid_y)
 
     # 测试过的几个游戏的移动系数,鼠标灵敏度设置看备注
@@ -197,7 +205,7 @@ def get_bbox(c2, arr):
             exit('结束 get_bbox 进程中 ...')
         else:
             if aims and LOCK_MOUSE:
-                p = threading.Thread(target=mouse_lock_def, args=(aims, mouse, MONITOR.get('width'), MONITOR.get('height'), pid_xy, move_factor, arr))
+                p = threading.Thread(target=mouse_lock_def, args=(aims, mouse, LOCK_PRESS, C, pid_xy, move_factor, arr), kwargs=MONITOR)
                 p.start()
         current_time = time()
         # 耗费时间
@@ -208,7 +216,7 @@ def get_bbox(c2, arr):
         process_times.append(time_used)
         median_time = median(process_times)
         pid_x.sample_time = pid_y.sample_time = median_time
-        pid_x.kp = pid_y.kp = 1 / pow(fps / 3, 1 / 3)
+        pid_x.Kp = pid_y.Kp = 1 / pow(fps / 2, 1 / 2)
         # 更新 fps
         change_withlock(arr, 3, 1 / median_time if median_time > 0 else 1 / (median_time + SMALL_FLOAT), process_lock)
 
