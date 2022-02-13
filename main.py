@@ -1,4 +1,3 @@
-import math
 import signal
 import threading
 import warnings
@@ -25,12 +24,6 @@ from utils.plots import Annotator, colors
 
 # 消除警告信息
 warnings.filterwarnings('ignore')
-# 加载模型
-model, device, half = load_model_infos()
-
-# 获取模型其他参
-stride = int(model.stride.max())  # model stride
-names = model.module.names if hasattr(model, 'module') else model.names  # get class names
 
 # 自瞄开关
 LOCK_MOUSE = False
@@ -59,6 +52,9 @@ def img_init(p1):
     print('进程 img_init 启动 ...')
     # 启用 mss 截图
     sct = mss.mss()
+    # 加载模型
+    model, device, half, stride, names, imgsz = load_model_infos()
+
     while True:
         # 获取指定位置 MONITOR 大小
         img0 = sct.grab(MONITOR)
@@ -73,7 +69,7 @@ def img_init(p1):
         # img0 = cv2.resize(img0, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
         # Padded resize
-        img = letterbox(img0, IMGSZ, stride=stride)[0]
+        img = letterbox(img0, imgsz, stride=stride)[0]
 
         # Convert
         img = img.transpose((2, 0, 1))[::-1]  # HWC to CHW, BGR to RGB
