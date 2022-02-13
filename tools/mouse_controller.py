@@ -57,8 +57,8 @@ def mouse_lock_def(aims, mouse, LOCK_PRESS, C, pids, move_factor, arr, left, top
 
     # 判断是否需要移动
     if move_x or move_y:
-        # move_x = FOV(move_x, x) / DPI * move_factor
-        # move_y = FOV(move_y, y) / DPI * move_factor
+        move_x = FOV(move_x, x) / DPI * move_factor
+        move_y = FOV(move_y, y) / DPI * move_factor
 
         move_x = - pid_x(move_x)
         move_y = - pid_y(move_y)

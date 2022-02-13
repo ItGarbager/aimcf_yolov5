@@ -25,12 +25,7 @@ from utils.plots import Annotator, colors
 # 消除警告信息
 warnings.filterwarnings('ignore')
 # 加载模型
-model, device, half = load_model_infos()
-
-# 获取模型其他参
-stride = int(model.stride.max())  # model stride
-names = model.module.names if hasattr(model, 'module') else model.names  # get class names
-
+model, device, half, stride, names, imgsz = load_model_infos()
 # 自瞄开关
 LOCK_MOUSE = False
 
