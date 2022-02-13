@@ -2,6 +2,7 @@ import torch
 
 from models.experimental import attempt_load
 from tools.configs import WEIGHTS, IMGSZ
+from utils.general import check_img_size
 from utils.torch_utils import select_device
 
 
@@ -14,5 +15,10 @@ def load_model_infos():
     print('模型加载完毕 ...')
     if half:
         model.half()
-        model(torch.zeros(1, 3, *IMGSZ).to(device).type_as(next(model.parameters())))
-    return model, device, half
+    # 获取模型其他参
+    stride = int(model.stride.max())  # model stride
+    names = model.module.names if hasattr(model, 'module') else model.names  # get class names
+    imgsz = check_img_size(IMGSZ, s=stride)  # check image size
+    model(torch.zeros(1, 3, *imgsz).to(device).type_as(next(model.parameters())))  # run once
+
+    return model, device, half, stride, names, imgsz
