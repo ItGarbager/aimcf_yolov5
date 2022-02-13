@@ -26,4 +26,18 @@ def on_click(x, y, button, pressed):
 # configs.py
 # 自瞄开关按键
 AIM_BUTTON = 'x2'  # 对应按键的关系表可以百度
+
+# 查不到的自己测试
+import pynput
+# 鼠标点击监听
+def on_click(x, y, button, pressed):
+    print(button)
+
+
+# 监听鼠标事件
+listener = pynput.mouse.Listener(on_click=on_click)
+listener.start()
+while True:
+    pass
+
 ```
