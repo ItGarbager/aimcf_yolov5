@@ -27,8 +27,11 @@ RESIZE_Y = 100
 # 模型文件
 WEIGHTS = 'weights/cf.pt'
 
+# 检测源
+SOURCE = 'rtmp://localhost:1935/live/demo'
+
 # 预测转换图片大小
-IMGSZ = (640, 640)  # 默认
+IMGSZ = [640, 640]  # 默认
 
 # 置信度
 CONF_THRES = .4  # 大于该置信度的目标才会被显示
