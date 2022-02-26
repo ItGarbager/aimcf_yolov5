@@ -1,5 +1,9 @@
 # aimcf_yolov5-v2
 
+<p dir="auto" style="color: #f10505;font-size: 40px">课程代码在aimtools.zip中！！！</p>
+
+<p dir="auto" style="color: #000ec1;font-size: 30px">up 最近工作赶项目，等结束会给大家带新的视频</p>
+
 使用yolov5算法实现cf自瞄
 
 当前版本需要一定的设备支持，目前是使用 Logitech ghub 实现的鼠标移动，如有更好的方法可以交流
