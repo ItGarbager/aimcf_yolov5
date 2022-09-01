@@ -4,6 +4,8 @@
 
 <p dir="auto" style="color: #000ec1;font-size: 30px">up 最近工作赶项目，等结束会给大家带新的视频</p>
 
+> aimtools.zip [蓝奏云下载地址](https://musuyun.lanzouw.com/iBuU60ataitc)
+
 使用yolov5算法实现cf自瞄
 
 当前版本需要一定的设备支持，目前是使用 Logitech ghub 实现的鼠标移动，如有更好的方法可以交流
